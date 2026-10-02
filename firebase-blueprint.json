@@ -1,0 +1,143 @@
+{
+  "entities": {
+    "Container": {
+      "title": "Container",
+      "description": "Peti kemas operasional terminal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "containerNo": { "type": "string", "maxLength": 20 },
+        "size": { "type": "string", "enum": ["20ft", "40ft", "45ft"] },
+        "type": { "type": "string", "enum": ["Dry", "Reefer", "Open Top", "Tank", "Flat Rack"] },
+        "status": { "type": "string", "enum": ["Full", "Empty"] },
+        "grossWeight": { "type": "number" },
+        "yardLocation": { "type": "string", "maxLength": 50 },
+        "owner": { "type": "string", "maxLength": 100 },
+        "voyageNo": { "type": "string", "maxLength": 50 },
+        "arrivalDate": { "type": "string" },
+        "isoCode": { "type": "string", "maxLength": 10 }
+      },
+      "required": ["containerNo", "size", "type", "status", "grossWeight", "yardLocation", "owner"]
+    },
+    "Vessel": {
+      "title": "Vessel",
+      "description": "Jadwal dan operasional kapal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "vesselName": { "type": "string", "maxLength": 100 },
+        "voyageCode": { "type": "string", "maxLength": 50 },
+        "eta": { "type": "string" },
+        "etd": { "type": "string" },
+        "berthNo": { "type": "string", "maxLength": 20 },
+        "status": { "type": "string", "enum": ["Scheduled", "Berthing", "Working", "Departed"] },
+        "totalTeus": { "type": "number" },
+        "handledTeus": { "type": "number" },
+        "shippingAgent": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["vesselName", "voyageCode", "eta", "etd", "berthNo", "status"]
+    },
+    "YardBlock": {
+      "title": "YardBlock",
+      "description": "Blok lapangan penumpukan peti kemas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "blockName": { "type": "string", "maxLength": 20 },
+        "capacity": { "type": "number" },
+        "currentOccupied": { "type": "number" },
+        "blockType": { "type": "string", "enum": ["General", "Reefer", "Dangerous", "Empty"] }
+      },
+      "required": ["blockName", "capacity", "currentOccupied", "blockType"]
+    },
+    "GateTransaction": {
+      "title": "GateTransaction",
+      "description": "Transaksi truk masuk dan keluar gate terminal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ticketNo": { "type": "string", "maxLength": 50 },
+        "truckPlate": { "type": "string", "maxLength": 20 },
+        "driverName": { "type": "string", "maxLength": 100 },
+        "containerNo": { "type": "string", "maxLength": 20 },
+        "direction": { "type": "string", "enum": ["GATE_IN", "GATE_OUT"] },
+        "status": { "type": "string", "enum": ["Approved", "Inspected", "Completed", "Pending"] },
+        "timestamp": { "type": "string" },
+        "operator": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["ticketNo", "truckPlate", "driverName", "containerNo", "direction", "status", "timestamp"]
+    },
+    "OperationActivity": {
+      "title": "OperationActivity",
+      "description": "Aktivitas bongkar muat dan pergerakan peti kemas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "containerNo": { "type": "string", "maxLength": 20 },
+        "vesselCode": { "type": "string", "maxLength": 50 },
+        "activityType": { "type": "string", "enum": ["DISCHARGE", "LOAD", "SHIFT", "GATE_IN", "GATE_OUT"] },
+        "status": { "type": "string", "enum": ["Completed", "In Progress", "Scheduled"] },
+        "equipmentNo": { "type": "string", "maxLength": 30 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["containerNo", "activityType", "status", "timestamp"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Notifikasi otomatis sistem operasional",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 500 },
+        "type": { "type": "string", "enum": ["info", "warning", "success", "danger"] },
+        "timestamp": { "type": "string" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["title", "message", "type", "timestamp", "read"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Profil pengguna dan hak akses operasional",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["Admin", "Yard Operator", "Gate Officer", "Operations Manager"] },
+        "status": { "type": "string", "enum": ["Active", "Inactive"] }
+      },
+      "required": ["email", "name", "role", "status"]
+    }
+  },
+  "firestore": {
+    "/containers/{containerId}": {
+      "schema": { "$ref": "Container" },
+      "description": "Koleksi peti kemas terminal"
+    },
+    "/vessels/{vesselId}": {
+      "schema": { "$ref": "Vessel" },
+      "description": "Koleksi jadwal dan kapal"
+    },
+    "/yardBlocks/{blockId}": {
+      "schema": { "$ref": "YardBlock" },
+      "description": "Koleksi blok lapangan penumpukan"
+    },
+    "/gateTransactions/{gateId}": {
+      "schema": { "$ref": "GateTransaction" },
+      "description": "Koleksi transaksi gate truk"
+    },
+    "/operations/{opId}": {
+      "schema": { "$ref": "OperationActivity" },
+      "description": "Koleksi aktivitas bongkar muat"
+    },
+    "/notifications/{notifId}": {
+      "schema": { "$ref": "Notification" },
+      "description": "Koleksi notifikasi otomatis"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Koleksi profil pengguna"
+    }
+  }
+}

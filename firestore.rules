@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Containers
+    match /containers/{containerId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(containerId) && incoming().containerNo is string && incoming().containerNo.size() <= 20;
+      allow update: if isSignedIn() && isValidId(containerId) && incoming().containerNo is string;
+      allow delete: if isSignedIn();
+    }
+
+    // Vessels
+    match /vessels/{vesselId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(vesselId) && incoming().vesselName is string;
+      allow update: if isSignedIn() && isValidId(vesselId) && incoming().vesselName is string;
+      allow delete: if isSignedIn();
+    }
+
+    // Yard Blocks
+    match /yardBlocks/{blockId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(blockId) && incoming().blockName is string;
+      allow update: if isSignedIn() && isValidId(blockId) && incoming().blockName is string;
+      allow delete: if isSignedIn();
+    }
+
+    // Gate Transactions
+    match /gateTransactions/{gateId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(gateId) && incoming().ticketNo is string;
+      allow update: if isSignedIn() && isValidId(gateId) && incoming().ticketNo is string;
+      allow delete: if isSignedIn();
+    }
+
+    // Operations
+    match /operations/{opId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(opId) && incoming().containerNo is string;
+      allow update: if isSignedIn() && isValidId(opId) && incoming().containerNo is string;
+      allow delete: if isSignedIn();
+    }
+
+    // Notifications
+    match /notifications/{notifId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(notifId) && incoming().title is string;
+      allow update: if isSignedIn() && isValidId(notifId) && incoming().title is string;
+      allow delete: if isSignedIn();
+    }
+
+    // Users
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(userId) && incoming().email is string;
+      allow update: if isSignedIn() && isValidId(userId) && incoming().email is string;
+      allow delete: if isSignedIn();
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "PortTerminal Pro - Terminal Peti Kemas OS",
+  "description": "Sistem Operasional Terminal Peti Kemas Real-Time dengan Manajemen Yard, Kapal, Gate, Laporan, dan Analitik Terintegrasi Database Cloud.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
