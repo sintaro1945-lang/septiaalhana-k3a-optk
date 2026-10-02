@@ -16,7 +16,7 @@ import { auth, googleProvider } from '../firebase';
 import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 
 interface LoginProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (email?: string) => void;
 }
 
 export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
@@ -38,11 +38,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         await signInWithEmailAndPassword(auth, email, password);
       }
       localStorage.setItem('terminal_user', email);
-      onLoginSuccess();
+      onLoginSuccess(email);
     } catch (err: any) {
       console.warn("Auth warning:", err.message);
       localStorage.setItem('terminal_user', email);
-      onLoginSuccess();
+      onLoginSuccess(email);
     } finally {
       setLoading(false);
     }
@@ -52,8 +52,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     setLoading(true);
     setError(null);
     try {
-      await signInWithPopup(auth, googleProvider);
-      onLoginSuccess();
+      const res = await signInWithPopup(auth, googleProvider);
+      const userEmail = res.user?.email || 'google-user@terminal.id';
+      localStorage.setItem('terminal_user', userEmail);
+      onLoginSuccess(userEmail);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Login dengan Google gagal.');
@@ -66,7 +68,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     setEmail(demoEmail);
     setPassword('terminal123');
     localStorage.setItem('terminal_user', demoEmail);
-    onLoginSuccess();
+    onLoginSuccess(demoEmail);
   };
 
   return (

@@ -314,7 +314,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login onLoginSuccess={() => {}} />;
+    return <Login onLoginSuccess={(email) => setUser({ email: email || 'admin@terminal.id', uid: 'local-user' })} />;
   }
 
   return (
