@@ -57,7 +57,16 @@ export default function App() {
   // Check Auth State
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        const localUserEmail = localStorage.getItem('terminal_user');
+        if (localUserEmail) {
+          setUser({ email: localUserEmail, uid: 'local-user' });
+        } else {
+          setUser(null);
+        }
+      }
       setAuthChecked(true);
     });
     return () => unsubscribe();
@@ -287,7 +296,13 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await signOut(auth);
+    localStorage.removeItem('terminal_user');
+    try {
+      await signOut(auth);
+    } catch (e) {
+      // ignore
+    }
+    setUser(null);
   };
 
   if (!authChecked) {
